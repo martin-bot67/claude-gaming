@@ -45,6 +45,10 @@ function txt(s, x, y, size, col, al) {
 function drawFloor(f, t) {
   const y = (f.depth - 1) * FH, x0 = 8, w = SX - 18, res = f.cat === 'RESIDENTIAL', fy = y + FH - 16, px = 196, tp = fy;
   const base = res ? '#6a5540' : TYPES[f.type].c;
+  R(x0 - 2, y + 2, w + 4, 2, '#100e0c');
+  R(x0 - 2, y + 2, 2, FH - 4, '#100e0c');
+  R(x0 + w, y + 2, 2, FH - 4, '#100e0c');
+  R(x0 - 2, y + FH - 2, w + 4, 2, '#100e0c');
   R(x0, y + 4, w, FH - 8, base); R(x0, y + 4, w, FH - 8, '#00000044');
   for (let i = 0; i < w; i += 42) { R(x0 + i, y + 8, 2, FH - 24, '#0000003a'); R(x0 + i + 2, y + 8, 1, FH - 24, '#ffffff14'); }
   R(x0, y + 4, w, 4, '#0007'); R(x0, fy, w, 12, '#1e1a16');
@@ -100,9 +104,7 @@ export function draw(t) {
   const e = S.elev, nF = S.floors.length, bottom = (nF + (S.build ? 1 : 0)) * FH, cy = (e.pos - 1) * FH + 6;
   ctx.imageSmoothingEnabled = false;
   R(0, 0, W, H, '#14110f');
-  const shake = (rt.shake || 0) * 2;
   ctx.save();
-  ctx.translate(Math.sin(t * 91) * shake, Math.cos(t * 73) * shake);
   ctx.translate(0, Math.round(-rt.camY));
   const day = (Math.sin(t * 0.06) + 1) / 2, mix = (a, b) => a.map((v, i) => Math.round(v + (b[i] - v) * day));
   const g = ctx.createLinearGradient(0, -FH - 220, 0, -14); g.addColorStop(0, 'rgb(' + mix([11, 16, 32], [52, 86, 140]) + ')'); g.addColorStop(1, 'rgb(' + mix([106, 79, 85], [232, 150, 98]) + ')');
@@ -121,23 +123,22 @@ export function draw(t) {
   for (let i = 0; i < W; i += 14) R(i + Math.round(Math.sin(t * 2 + i)), -18 - (i % 3), 2, 4 + i % 3, '#5b6b3a');
   R(36, -28, 10, 14, '#333'); R(34, -30, 14, 3, '#555');
   for (let k = 0; k < 5; k++) { const ph = (t * 0.4 + k / 5) % 1; ctx.globalAlpha = 0.4 * (1 - ph); R(38 + Math.sin(ph * 6 + k) * 8, -32 - ph * 56, 6 + ph * 8, 6 + ph * 8, '#9a9a9a'); } ctx.globalAlpha = 1;
-  const firstDepth = Math.max(-1, Math.floor(rt.camY / FH) - 1);
-  const lastDepth = Math.ceil((rt.camY + H) / FH) + 1;
-  drawUnderground(ctx, firstDepth, lastDepth);
-  drawUndergroundEffects(ctx, firstDepth, lastDepth, t);
+  drawUnderground(ctx, nF);
+  drawUndergroundEffects(ctx, t, rt.camY);
+  R(SX - 4, -FH, 2, bottom + FH, '#100e0c');
   R(SX - 2, -FH, W - SX - 6, bottom + FH, '#38291f99');
+  R(W - 5, -FH, 2, bottom + FH, '#100e0c');
   R(SX - 2, -FH, 3, bottom + FH, '#66513b'); R(W - 8, -FH, 3, bottom + FH, '#66513b');
   R(SX - 8, -FH - 10, 92, 10, '#555');
   for (let i = 0; i < 92; i += 16) R(SX - 8 + i, -FH - 8, 8, 6, '#e0a030');
   txt('SURFACE GATE', 14, -FH + 18, 11, '#cfe0f0');
   S.floors.forEach(f => {
     const y = (f.depth - 1) * FH;
-    R(W - 24, y + FH - 18, 8, 8, Math.abs(e.pos - f.depth) < 0.2 ? '#7fff9a' : '#e0a030');
-    txt('B' + f.depth, W - 12, y + FH - 21, 9, '#9a8f7c', 'right');
     if (f.depth % 5 === 0) {
-      R(W - 46, y + 25, 38, 12, '#171512dd');
-      R(W - 46, y + 25, 2, 12, '#e0a030');
-      txt('DEPTH ' + f.depth, W - 11, y + 34, 8, '#d4bb8a', 'right');
+      R(1, y + FH - 20, 5, 1, '#71695c');
+      R(1, y + FH - 17, 3, 1, '#71695c');
+      ctx.font = '6px "Courier New",monospace';
+      txt(String(f.depth), 0, y + FH - 9, 6, '#71695c');
     }
   });
   S.queue.forEach((r, i) => {
@@ -154,9 +155,13 @@ export function draw(t) {
     R(18, y + 44, bw, 10, '#0a0908'); R(18, y + 44, Math.round(bw * p), 10, '#e0a030');
     for (let i = 0; i < bw; i += 8) R(18 + i, y + 44, 1, 10, '#0006');
     const drillX = 18 + Math.round(bw * p);
-    for (let i = 0; i < 5; i++) {
-      const fall = (t * (18 + i * 2) + i * 13) % 1;
-      R(12 + ((i * 43 + Math.floor(t * 3)) % (SX - 38)), y + 7 + fall * 18, 2, 2, i % 2 ? '#8a7254' : '#c4a06a');
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(8, y + 4, SX - 18, FH - 8);
+    ctx.clip();
+    for (let i = 0; i < 3; i++) {
+      const fall = (t * (8 + i * 2) + i * 13) % 1;
+      R(drillX - 5 + i * 4, y + 25 + fall * 12, 1, 1, '#8a7254');
     }
     if (Math.sin(t * 20) > -0.3) {
       R(drillX + Math.sin(t * 37) * 3, y + 41 + Math.cos(t * 29) * 5, 2, 2, '#ffd070');
@@ -166,16 +171,8 @@ export function draw(t) {
     ctx.drawImage(headlamp, crewX - 36, y - 18);
     R(crewX + 3, y + 18, 4, 2, '#f7d56a');
     figure(crewX, y + 21, 'crew', t);
+    ctx.restore();
     txt('B' + b.depth + ' under construction', 14, y + 19, 11, '#f1e6cc'); txt(Math.ceil(b.left) + 's', SX - 16, y + 19, 11, '#ffe9a8', 'right');
-  }
-  if (rt.digFinish && rt.digFinish.t > 0) {
-    const elapsed = 0.7 - rt.digFinish.t, y = rt.digFinish.depth * FH + 3;
-    for (let i = 0; i < 8; i++) {
-      const spread = elapsed * (10 + i * 2), px = 18 + ((i * 47) % (SX - 40));
-      ctx.globalAlpha = Math.max(0, 1 - elapsed / 0.7);
-      R(px + Math.sin(i * 5) * spread, y - elapsed * (8 + i % 3 * 3), 2, 2, i % 2 ? '#b7986a' : '#77634b');
-    }
-    ctx.globalAlpha = 1;
   }
   const eg = ctx.createRadialGradient(SX + 36, cy + 30, 4, SX + 36, cy + 30, 80); eg.addColorStop(0, 'rgba(255,233,168,.22)'); eg.addColorStop(1, 'rgba(255,233,168,0)'); ctx.fillStyle = eg; ctx.fillRect(SX - 44, cy - 50, 160, 160);
   R(SX + 20, -FH - 10, 2, cy + FH + 10, '#777'); R(SX + 50, -FH - 10, 2, cy + FH + 10, '#777');
@@ -194,5 +191,7 @@ export function draw(t) {
   txt('+' + rt.incPS.toFixed(1) + '/s  PWR ' + poweredRoomCount() + '/' + powerDemand(), W - 10, 17, 13, powerDemand() > poweredRoomCount() && Math.sin(t * 6) > 0 ? '#ff8c75' : '#a8d67a', 'right');
   txt(S.surv.length + '/' + housingCapacity() + ' survivors  depth B' + nF, W - 10, 34, 11, '#cfc4b0', 'right');
   if (rt.toast.t > 0) { R(40, 54, W - 80, 28, '#000d'); R(40, 54, 3, 28, '#e0a030'); txt(rt.toast.s, W / 2, 73, 12, '#fff', 'center'); }
-  if (!nF && !S.build) txt('Open Build to dig your first floor.', W / 2, 112, 12, '#ffd070', 'center');
+  if (!S.floors.some(f => f.cat === 'RESIDENTIAL')) {
+    txt('Dig a Residential floor to house survivors.', SX / 2, 98, 12, '#ffd070', 'center');
+  }
 }

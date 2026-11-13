@@ -25,7 +25,8 @@ export const SAVE_KEY = 'tiny-bunker-save-v1';
 
 export const fresh = () => ({
   v: 1, scrap: 10000, bat: 10, nid: 100,
-  floors: [], surv: [], queue: [], build: null,
+  floors: [{ id: 'floor_b1', depth: 1, cat: 'COMMERCIAL', type: 'ENERGY', name: 'Generator Room' }],
+  surv: [], queue: [], build: null,
   elev: { pos: 0, sl: 0, tl: 0, pax: [] }, delivered: 0, shopSpinAt: 0
 });
 export let S = fresh();
@@ -42,7 +43,7 @@ export const mkSurvivor = (forceRare = false) => {
 
 
 /* Runtime state shared between modules (not saved) */
-export const rt = { goal: null, camY: -FH - 40, incPS: 0, toast: { t: 0, s: '' }, shake: 0, digFinish: null };
+export const rt = { goal: null, camY: -FH - 40, incPS: 0, toast: { t: 0, s: '' } };
 export const keys = { up: false, down: false };
 export const fx = [];
 export const walkers = {}, outs = [];

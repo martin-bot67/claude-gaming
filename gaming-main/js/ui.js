@@ -58,8 +58,8 @@ function openPanel(kind) {
   if (kind === 'build') {
     const d = S.floors.length + 1;
     h = '<h2>Dig B' + d + '</h2><p>Cost: ' + cost(d) + ' scrap. Build time: ' + buildTime(d) + 's.</p>' +
-      '<p>Random type is free. Choosing an exact type costs 5 batteries.</p>' +
-      '<select id="ftype"><option value="RANDOM">Random type</option><option value="RESIDENTIAL">Residential (bunks)</option>' +
+      '<p>Residential (bunks) is recommended first. Choosing a type costs 5 batteries; Random is free.</p>' +
+      '<select id="ftype"><option value="RANDOM">Random type</option><option value="RESIDENTIAL" selected>Residential (bunks)</option>' +
       TK.map(k => '<option value="' + k + '">' + k[0] + k.slice(1).toLowerCase() + ' floor</option>').join('') + '</select>' +
       '<div class="row"><button data-act="do-build">Start digging</button>' +
       (S.build ? '<button data-act="do-rush">Rush (' + (Math.ceil(S.build.left / 10) + 1) + ' batt)</button>' : '') + '</div>';
