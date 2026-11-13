@@ -15,10 +15,15 @@ B Build, U Upgrade, H Shop, Esc close menu.
 ## Features
 - Autosave every 10 seconds, plus offline earnings (50% of income, up to 8 hours).
 - Scavenger salvage bonuses every 45-90 seconds while the bunker is earning.
+- New bunkers start with 10,000 scrap and a Generator Room at B1; build a Residential floor to house survivors.
 - Day and night sky, drifting clouds, floating dust, work and sleep icons, and dimmed unpowered rooms.
-- Seeded, depth-aware underground strata, buried finds, bunker infrastructure, and digging effects.
+- Seeded, cached, low-contrast underground strata with sparse details and subtle depth markers.
 - Admin tools are available only with `?admin` in the URL (client-side only, not secure).
 
-## Screenshot
+## Underground comparison
 
-![Tiny Bunker underground](./screenshots/underground.png)
+| Depth | Before | After |
+| --- | --- | --- |
+| 1 floor | ![Before: one floor](./screenshots/before/1-floor.png) | ![After: one floor](./screenshots/after/1-floor.png) |
+| 5 floors | ![Before: five floors](./screenshots/before/5-floors.png) | ![After: five floors](./screenshots/after/5-floors.png) |
+| 12 floors | ![Before: twelve floors](./screenshots/before/12-floors.png) | ![After: twelve floors](./screenshots/after/12-floors.png) |

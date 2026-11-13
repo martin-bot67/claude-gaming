@@ -84,8 +84,6 @@ export function rushBuild() {
 }
 export function finishBuild() {
   const b = S.build; S.build = null;
-  rt.shake = 0.18;
-  rt.digFinish = { depth: b.depth, t: 0.7 };
   const f = { id: 'floor_b' + b.depth, depth: b.depth };
   if (b.kind === 'RESIDENTIAL') { f.cat = 'RESIDENTIAL'; f.name = 'Bunks'; }
   else { f.cat = 'COMMERCIAL'; f.type = b.kind; f.name = pick(TYPES[b.kind].n); }
@@ -143,8 +141,6 @@ export function walk(o, tx, sp, dt) {
 }
 export function update(dt) {
   rt.incPS = 0;
-  rt.shake = Math.max(0, rt.shake - dt);
-  if (rt.digFinish && (rt.digFinish.t -= dt) <= 0) rt.digFinish = null;
   S.floors.forEach(f => { if (isPowered(f)) rt.incPS += income(f); });
   S.scrap += rt.incPS * dt;
   if (S.build && (S.build.left -= dt) <= 0) finishBuild();
@@ -205,6 +201,7 @@ export function load() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) { importSave(raw, true); offlineEarnings(); S.lastSeen = Date.now(); }
+    else say('Build Bunks to house refugees.');
   } catch (e) {}
 }
 export function importSave(str, silent) {
@@ -214,4 +211,4 @@ export function importSave(str, silent) {
   const el = S.elev; if (!el.pax) el.pax = el.pass ? [el.pass] : []; delete el.pass;
   if (!silent) say('Save imported.');
 }
-export function hardReset() { setState(fresh()); rt.goal = null; fx.length = 0; save(); say('Bunker reset.'); }
+export function hardReset() { setState(fresh()); rt.goal = null; fx.length = 0; save(); say('Build Bunks to house refugees.'); }
